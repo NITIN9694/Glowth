@@ -5,6 +5,7 @@ import 'dart:developer';
 
 import 'package:dio/dio.dart';
 
+import '../model/skin_data_model.dart';
 import 'api_constant.dart';
 import 'dio_logger.dart';
 
@@ -171,6 +172,34 @@ class ApiProvider {
     // Get.offAllNamed(Routes.authScreen);
   }
 
+
+  Future<SkinDataModel> analyzeFaceApiFunc(String filePath, String gender,String endPoints) async {
+    try {
+
+
+      FormData data = FormData.fromMap({
+        'image': [
+          await MultipartFile.fromFile(filePath, filename: filePath.split("/").last),
+        ],
+        'gender': gender,
+      });
+      log("baseUrl ${apiEndPoints.baseUrl + endPoints}");
+      Response response = await _dio.post(
+        apiEndPoints.baseUrl + endPoints,
+
+        data: data,
+
+      );
+
+      print("analyzeFace>>> ${response.data}");
+      return SkinDataModel.fromJson(response.data);
+
+
+    } on DioError catch (e) {
+      print('Error: ${e.response?.data ?? e.message}');
+      throw e;
+    }
+  }
 
 
 }

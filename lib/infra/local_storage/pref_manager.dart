@@ -1,23 +1,18 @@
-
-
-
-
 import 'package:hive/hive.dart';
 
 class HiveManager {
   static const String _boxName = "AppBox";
   static Box? _box;
 
-
-  static Future<void> init()async{
-    if(!Hive.isBoxOpen(_boxName)){
+  static Future<void> init() async {
+    if (!Hive.isBoxOpen(_boxName)) {
       _box = await Hive.openBox(_boxName);
-    }else{
+    } else {
       _box = Hive.box(_boxName);
     }
   }
 
-  static Future<void> putString(String key, String value)async{
+  static Future<void> putString(String key, String value) async {
     await _box?.put(key, value);
   }
 
@@ -48,5 +43,4 @@ class HiveManager {
   static Future<void> clear() async {
     await _box?.clear();
   }
-
 }

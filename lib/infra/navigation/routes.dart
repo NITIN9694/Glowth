@@ -5,6 +5,7 @@ class Routes {
   static const home = '/home';
   static const scanFace = '/scanFace';
 
+  static const skinDataPage = '/skinDataPage';
 
 
 }

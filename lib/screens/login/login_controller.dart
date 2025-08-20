@@ -8,4 +8,7 @@ class LoginController extends GetxController {
   var isMale = 0.obs;
   TextEditingController nameController = TextEditingController();
 
+  
+
+
 }

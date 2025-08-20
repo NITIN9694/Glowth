@@ -7,6 +7,8 @@ import 'package:glowth/screens/login/login_binding.dart';
 import 'package:glowth/screens/login/login_screen.dart';
 import 'package:glowth/screens/scan_face/scan_face_binding.dart';
 import 'package:glowth/screens/scan_face/scan_face_screen.dart';
+import 'package:glowth/screens/skin_data_screen/skin_data_screen.dart';
+import '../../screens/skin_data_screen/skin_data_binding.dart';
 import 'routes.dart';
 
 class Nav {
@@ -27,6 +29,10 @@ class Nav {
       page: () => ScanFaceScreen(),
       binding: ScanFaceBinding(),
     ),
-
+    GetPage(
+      name: Routes.skinDataPage,
+      page: () => SkinDataScreen(),
+      binding: SkinDataBinding(),
+    ),
   ];
 }

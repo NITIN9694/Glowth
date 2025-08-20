@@ -9,6 +9,7 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:glowth/infra/utills/base_view.dart';
 import 'package:glowth/screens/scan_face/scan_face_controller.dart';
 import 'package:camera/camera.dart';
+import 'package:glowth/screens/scan_face/widgets/face_animation.dart';
 import 'package:glowth/screens/scan_face/widgets/face_mesh_painter.dart';
 class ScanFaceScreen extends BaseView<ScanFaceController>{
 
@@ -43,7 +44,7 @@ class ScanFaceScreen extends BaseView<ScanFaceController>{
               left: 30,
               child: GestureDetector(
                 onTap: () {
-                  print("thi");
+
                   controller.selectedImagePath.value = "";
 
 
@@ -64,13 +65,10 @@ class ScanFaceScreen extends BaseView<ScanFaceController>{
              return   IgnorePointer(
                     ignoring: true,
 
-                child:  CustomPaint(
-                  size: Size(constraints.maxWidth, constraints.maxHeight),
-                  painter: FaceMeshPainter(
-                    controller.facePoints,
-                    controller.originalImageWidth.value,
-                    controller.originalImageHeight.value,
-                  ),
+                child:  FaceScanAnimation(
+                  originalWidth: controller.originalImageWidth.value,
+                  originalHeight:  controller.originalImageHeight.value,
+                  facePoints:  controller.facePoints,
                 ));
               },
             ),
@@ -80,44 +78,6 @@ class ScanFaceScreen extends BaseView<ScanFaceController>{
     );
   }
 
-  Widget _bottomProductPanel() {
-    return Align(
-      alignment: Alignment.bottomCenter,
-      child: Container(
-        padding: EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.black.withOpacity(0.6),
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text("Daily Activity", style: TextStyle(color: Colors.white, fontSize: 18)),
-            SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                _productCard("Revive Eye Serum"),
-                _productCard("Bean Stick Balm"),
-                _productCard("Cream"),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-  Widget _productCard(String title) {
-    return Container(
-      width: 80,
-      height: 100,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Center(child: Text(title, textAlign: TextAlign.center)),
-    );
-  }
   _cameraPreview() {
     return Stack(
       children: [
@@ -189,39 +149,4 @@ class ScanFaceScreen extends BaseView<ScanFaceController>{
   }
 
 
-  Widget skinTypeChip(String label) {
-    return Chip(
-      label: Text(label),
-      backgroundColor: Colors.grey[200],
-    );
-  }
-}
-
-class FaceScanOverlayPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.white
-      ..strokeWidth = 1
-      ..style = PaintingStyle.stroke;
-
-    // Mock: Draw rectangle and a few points
-    final faceRect = Rect.fromLTWH(size.width * 0.2, size.height * 0.2, size.width * 0.6, size.height * 0.6);
-    canvas.drawRect(faceRect, paint);
-
-    final pointPaint = Paint()
-      ..color = Colors.white
-      ..style = PaintingStyle.fill;
-
-    for (var i = 0; i < 8; i++) {
-      canvas.drawCircle(
-        Offset(faceRect.left + (i % 4) * (faceRect.width / 3), faceRect.top + (i ~/ 4) * faceRect.height),
-        4,
-        pointPaint,
-      );
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

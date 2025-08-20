@@ -1,6 +1,10 @@
 import 'dart:developer';
 import 'dart:io';
 import 'package:device_info_plus/device_info_plus.dart';
+import 'package:glowth/infra/api_service/dio_logger.dart';
+import 'package:glowth/infra/local_storage/app_constant.dart';
+import 'package:glowth/infra/local_storage/pref_manager.dart';
+import 'package:glowth/infra/navigation/routes.dart';
 
 import 'package:google_mlkit_commons/google_mlkit_commons.dart';
 import 'package:camera/camera.dart';
@@ -11,6 +15,9 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image/image.dart' as img;
 
+import '../../infra/api_service/api_provider.dart';
+import '../../infra/model/skin_data_model.dart';
+
 class ScanFaceController extends GetxController {
   CameraController? cameraController;
   List<CameraDescription>? cameras;
@@ -18,30 +25,28 @@ class ScanFaceController extends GetxController {
   var selectedImagePath = ''.obs;
   var facePoints = <Offset>[].obs;
   var originalImageWidth = 0.0.obs;
-   var originalImageHeight =  0.0.obs;
+  var originalImageHeight = 0.0.obs;
 
-
-   getOriginalImageHeightWidth(String path)async{
-     final bytes = await File(path).readAsBytes();
-     final decodedImage = img.decodeImage(bytes)!;
-     originalImageWidth.value = decodedImage.width.toDouble();
-     originalImageHeight.value = decodedImage.height.toDouble();
-   }
-
+  getOriginalImageHeightWidth(String path) async {
+    final bytes = await File(path).readAsBytes();
+    final decodedImage = img.decodeImage(bytes)!;
+    originalImageWidth.value = decodedImage.width.toDouble();
+    originalImageHeight.value = decodedImage.height.toDouble();
+  }
 
   final FaceDetector _faceDetector = FaceDetector(
-    options: FaceDetectorOptions(
-      enableContours: true,
-      enableLandmarks: true,
-    ),
+    options: FaceDetectorOptions(enableContours: true, enableLandmarks: true),
   );
 
+  var gender = "".obs;
   @override
   void onInit() {
     super.onInit();
+    Future.delayed(Duration.zero, () async {
+      gender.value = HiveManager.getString(AppConstant().gender);
+    });
     _checkPermissions();
   }
-
 
   Future<void> _checkPermissions() async {
     // Camera permission
@@ -50,16 +55,14 @@ class ScanFaceController extends GetxController {
       cameraStatus = await Permission.camera.request();
     }
 
-
-
     // If permanently denied → open settings
-    if (cameraStatus.isPermanentlyDenied ) {
+    if (cameraStatus.isPermanentlyDenied) {
       openAppSettings();
       return;
     }
     log("cameraStatus ${cameraStatus.isGranted}");
     // If granted
-    if (cameraStatus.isGranted ) {
+    if (cameraStatus.isGranted) {
       await _initCamera();
     } else {
       Get.snackbar("Permission Denied", "Camera & Gallery access is required");
@@ -73,7 +76,6 @@ class ScanFaceController extends GetxController {
     }
     return 0; // Not Android
   }
-
 
   Future<bool> requestGalleryPermission() async {
     int sdk = await _getSdkInt();
@@ -98,21 +100,18 @@ class ScanFaceController extends GetxController {
     return status.isGranted;
   }
 
-
-
   Future<void> checkPermissionsGallary() async {
-
-
     if (await requestGalleryPermission()) {
       await pickFromGallery();
       // Open gallery picker here
-    }else{
+    } else {
       openAppSettings();
     }
-
   }
 
-  Future<void> _initCamera({CameraLensDirection cameraDirection = CameraLensDirection.front}) async {
+  Future<void> _initCamera({
+    CameraLensDirection cameraDirection = CameraLensDirection.front,
+  }) async {
     // While initializing, hide preview
     isCameraInitialized.value = false;
 
@@ -124,7 +123,7 @@ class ScanFaceController extends GetxController {
     cameras = await availableCameras();
 
     final selectedCamera = cameras!.firstWhere(
-          (cam) => cam.lensDirection == cameraDirection,
+      (cam) => cam.lensDirection == cameraDirection,
       orElse: () => cameras!.first,
     );
 
@@ -142,21 +141,19 @@ class ScanFaceController extends GetxController {
     }
   }
 
-
   void flipCamera() async {
     if (cameras == null || cameras!.isEmpty) return;
 
-    final isFront = cameraController!.description.lensDirection == CameraLensDirection.front;
-    final newDirection = isFront
-        ? CameraLensDirection.back
-        : CameraLensDirection.front;
+    final isFront =
+        cameraController!.description.lensDirection ==
+        CameraLensDirection.front;
+    final newDirection =
+        isFront ? CameraLensDirection.back : CameraLensDirection.front;
 
     await _initCamera(cameraDirection: newDirection);
   }
 
-
   var isCapturing = false.obs;
-
 
   Future<void> capturePhoto() async {
     if (isCapturing.value) return; // Prevent multiple clicks
@@ -168,7 +165,7 @@ class ScanFaceController extends GetxController {
         print('Photo captured: ${picture.path}');
         selectedImagePath.value = picture.path;
         await getOriginalImageHeightWidth(picture.path);
-        await detectFace( selectedImagePath.value);
+        await detectFace(selectedImagePath.value);
       }
     } catch (e) {
       print("Error capturing photo: $e");
@@ -183,7 +180,7 @@ class ScanFaceController extends GetxController {
     if (image != null) {
       selectedImagePath.value = image.path;
       await getOriginalImageHeightWidth(image.path);
-    await  detectFace( selectedImagePath.value);
+      await detectFace(selectedImagePath.value);
     }
   }
 
@@ -202,12 +199,43 @@ class ScanFaceController extends GetxController {
     if (faces.isNotEmpty) {
       for (var face in faces) {
         if (face.contours[FaceContourType.face] != null) {
-          facePoints.addAll(face.contours[FaceContourType.face]!.points.map(
-                (p) => Offset(p.x.toDouble(), p.y.toDouble()),
-          ));
+          facePoints.addAll(
+            face.contours[FaceContourType.face]!.points.map(
+              (p) => Offset(p.x.toDouble(), p.y.toDouble()),
+            ),
+          );
         }
       }
     }
+    Future.delayed(Duration(seconds: 2), () async {
+      await analyzeFaceApi(path);
+    });
     update();
+  }
+
+  Future<SkinDataModel?> analyzeFaceApi(String filePath) async {
+    try {
+      SkinDataModel skinDataModel = await ApiProvider.baseWithToken()
+          .analyzeFaceApiFunc(
+            filePath,
+            gender.value.toUpperCase(),
+            "/analyze-face/",
+          );
+
+      var result = await Get.toNamed(
+        Routes.skinDataPage,
+        arguments: [skinDataModel, filePath],
+      );
+      if (result != null) {
+        selectedImagePath.value = "";
+      }
+    } on HttpException catch (e) {
+      selectedImagePath.value = "";
+      logWithColor("HttpException $e");
+    } catch (e) {
+      selectedImagePath.value = "";
+      logWithColor("catch $e");
+    }
+    return null;
   }
 }

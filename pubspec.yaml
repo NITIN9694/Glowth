@@ -62,6 +62,8 @@ dev_dependencies:
   google_mlkit_face_detection:
   image:
   device_info_plus:
+  flutter_staggered_grid_view:
+  flutter_spinkit: 
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
