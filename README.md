@@ -1,4 +1,4 @@
-# glowth
+# Glowth
 
 
 ## 📱 Overview
@@ -17,5 +17,8 @@ The app connects to a backend service that performs image processing and analysi
 - ✅ Integration with backend API for analysis  
 - ✅ Works on Android and iOS platforms  
 
+## 📩 Contact
+
+For support, feedback, or collaboration, reach out to: thenitinkumarjha@gmail.com
 
 <img width="1440" height="900" alt="Screenshot 2025-09-15 at 2 11 04 PM" src="https://github.com/user-attachments/assets/d1598d7c-cb71-4fc7-9162-3963edba8f97" />
