@@ -64,6 +64,7 @@ dev_dependencies:
   device_info_plus:
   flutter_staggered_grid_view:
   flutter_spinkit: 
+  url_launcher:  
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
