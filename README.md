@@ -1,16 +1,21 @@
 # glowth
 
-A new Flutter project.
 
-## Getting Started
+## 📱 Overview
+This Flutter application allows users to upload their picture, analyzes their facial features, and provides personalized recommendations such as suitable haircuts and skincare products.
 
-This project is a starting point for a Flutter application.
+The app connects to a backend service that performs image processing and analysis using machine learning models.
 
-A few resources to get you started if this is your first Flutter project:
+---
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## 🚀 Features
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- ✅ Capture or upload user images  
+- ✅ Analyze face shape and skin type  
+- ✅ Provide tailored hairstyle and skincare recommendations  
+- ✅ User-friendly and responsive UI  
+- ✅ Integration with backend API for analysis  
+- ✅ Works on Android and iOS platforms  
+
+
+<img width="1440" height="900" alt="Screenshot 2025-09-15 at 2 11 04 PM" src="https://github.com/user-attachments/assets/d1598d7c-cb71-4fc7-9162-3963edba8f97" />
